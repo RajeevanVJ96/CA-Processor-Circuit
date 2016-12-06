@@ -1,0 +1,114 @@
+course: CA4
+exercise: 2
+date: 2016-11-30
+author: Rajeevan Vijayakumar, 2080123V
+author: Alan Munro, 1107481M
+
+Task 1:
+
+Task one compilies without any warnings or errors and appears to function exactly as detailed in the specification. The implementation was tested against a program that we created which took an array and calculated the sum of it's values. The array include both positive and negative numbers. We used loadxi to increment the index as soon as we got the current value from the array and we got the expected result. Comments are included in the submission to show where additions and changes were made. The test program is based on the model solution used as a tutorial question with differences in the data.
+
+The overlying approach used to solve this problem of adding the loadxi instruction to combine the two separate instructions of load and increment was to create four separate states where one loads the current memory location indexed by pc into ad and then incrementing the pc in the same state. A second state incrementes the source address a by the ad while another sets the destination register to equal the memory location indexed by ad. And finally the last state increments the value in source address a by 1.
+
+At cycle 47, the first item in the array is loaded into R4 and immediatley at the next cycle the alu opcode is set to 1100 indicating x + 1. This simulates the use of loadxi as the increment is done straight after the load and the increment did not require a separate instruction which is the main aim of loadxi, make load and increment occur with a single instruction instead of two. At cycle 62, the instruction add  R4,R4,R6 has just executed and the result stored in R4 where the sum was -3 + 18 which is equal to 15 and in hex this is 000f. The final stum is loaded into the sum register at cycle 191 which based on the data used should be 159 and in hexidecimal this is equal to 009f.
+
+Cycle 47
+************************************************************************
+
+Register file update: R4 := fffd
+
+************************************************************************
+Executed instruction:  load  R4,0016[R0]   effective address = 0016
+R4 := fffd was loaded in cycle 47
+Processor state:    pc = 0008  ir = f401  ad = 0016
+************************************************************************
+
+
+Cycle 48
+************************************************************************
+
+
+Control signals
+    ctl_alu_a   = 1  ctl_alu_b   = 1  ctl_alu_c   = 0  ctl_alu_d   = 0
+    ctl_x_pc    = 1  ctl_y_ad    = 0  ctl_rf_ld   = 0  ctl_rf_pc   = 0
+    ctl_rf_alu  = 0  ctl_rf_sd   = 0  ctl_rf_increment  = 0  ctl_ir_ld   = 1
+    ctl_pc_ld   = 1  ctl_ad_ld   = 0  ctl_ad_alu  = 0  ctl_ma_pc   = 1
+    ctl_sto     = 0
+
+************************************************************************
+
+
+Cycle 62
+************************************************************************
+Register file update: R4 := 000f
+
+************************************************************************
+Executed instruction:  add  R4,R4,R6
+R4 := 000f was loaded in cycle 62
+Processor state:    pc = 000e  ir = 0446  ad = 0017
+************************************************************************
+
+
+Cycle 191
+************************************************************************
+Executed instruction:  store  R4,0015[R0]   effective address = 0015
+mem[0015] := 009f was stored in cycle 191
+Processor state:    pc = 0013  ir = f402  ad = 0015
+************************************************************************  
+
+
+
+
+Task 2:
+
+Task two compiles without any warnings or errors and appears to work correctly. All aspects of the
+program appear to work correctly without any noticeable errors. We add three states for multiplication where the first one does the multiplication, the second one waits for the multiplier to finish and the third state store the product of the multiplication into the destination register, getting it ready for the next multiplication. Comments are included in the submission to show where additions and changes were made.
+
+The overlying approach used to solve this problem of adding the multiplication functionality to the m1 circuit was to implement a while loop to do the multiplication. This is because the ALU on its own does not have a op code for multiply. This means we are adding the number we are multiplying to itself, by using the add functionality of the ALU, the number of times it needs to be multiplied while storing the result of each addition. Ie 4 * 4 mean we would loop 4 times where each time we would add 4 to itself 4 times to get 16. This would be similar approach to division where we would be subtracting instead of adding.
+
+Task two has been  tested against a Sigma16 program which multiplies four seperate equations. The first tests a small number which is 2 * 2 and returns the correct result. The second multiplies a positive number with a negative number and returns the expected output. The third multiplies two negatives numbers and gets the expected result. The fourth equation multiplies two large numbers 
+and gets the expected result.
+
+Cycle 25 and cycle 29 load values into registers 1 and two respectively, the product is then loaded into register three in cycle 36. The first state of mul, st_mul0 is true at clock cycle 32. ie mul R3,R1,R2 ; 2 * 2 = 4 
+
+
+Cycle 25
+************************************************************************                                              
+Executed instruction:  lea  R1,0002[R0]   effective address = 0002
+R1 := 0002 was loaded in cycle 25
+Processor state:    pc = 0002  ir = f100  ad = 0002
+************************************************************************
+
+
+Cycle 29
+************************************************************************
+Executed instruction:  lea  R2,0002[R0]   effective address = 0002                                                   
+R2 := 0002 was loaded in cycle 29
+Processor state:    pc = 0004  ir = f200  ad = 0002
+************************************************************************
+
+
+Cycle 32
+************************************************************************
+Computer system inputs
+         reset=0 dma=0 dma_a=0000 dma_d=0000
+ctl_start = 0
+
+Control state
+   st_instr_fet = 0  st_dispatch = 0       st_add = 0       st_sub = 0
+        st_mul0 = 1     st_cmplt = 0     st_cmpeq = 0     st_cmpgt = 0
+       st_trap0 = 0      st_lea0 = 0      st_lea1 = 0     st_load0 = 0
+       st_load1 = 0     st_load2 = 0    st_store0 = 0    st_store1 = 0
+      st_store2 = 0     st_jump0 = 0     st_jump1 = 0    st_jumpf0 = 0
+      st_jumpf1 = 0    st_jumpt0 = 0    st_jumpt1 = 0      st_jal0 = 0
+         st_jal1 = 0    st_loadxi0 = 0    st_loadxi1 = 0    st_loadxi2  = 0
+      st_loadxi3 = 0
+
+************************************************************************
+
+Cycle 36
+************************************************************************
+Executed instruction:  mul  R3,0002[R2]   effective address = 0002
+R3 := 0004 was loaded in cycle 36
+Processor state:    pc = 0005  ir = 2321  ad = 0002
+************************************************************************
